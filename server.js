@@ -1,12 +1,15 @@
 const net = require('net');
 const server = net.createServer();
 
+const HOST = "127.0.0.2"
+const PORT = "8888"
+
 /** @type {Map<import('net').Socket, string>} */
 const socketMap = new Map();
 
 server.once('listening', ()=> {console.log("server starts listening!");});
 
-server.listen(8888);
+server.listen(PORT, HOST);
 
 function sendAll(except, message)
 {
