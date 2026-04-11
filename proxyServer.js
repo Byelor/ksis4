@@ -12,9 +12,15 @@ function fromFileToSet(path)
 {
   try{
   const data = fs.readFileSync(path, {encoding: "utf-8"});
-  return new Set(data.split(/\r?\n/).map((el)=>{ 
-    return el.trim().toLowerCase().match(/(?<=http\:\/\/?).+(?=\/?)/);
-  }));
+  const array = (data.split(/\r?\n/)
+  .map((el)=>{ 
+    const obj = el.trim()
+    .toLowerCase()
+    .match(/(?:https?\:\/\/)?(?:www\.)?([^\/\s]+)/);
+    return obj ? obj[1] : null;
+  })
+).filter((el) => el !== null);
+  return new Set(array);
 }
   catch (error){
     console.log(`Ошибка чтения файла: ${error.message}`);
@@ -24,9 +30,11 @@ function fromFileToSet(path)
 
 const blackList = fromFileToSet("./blackList.txt");
 
-function isInBlackList(url, list)
+blackList.forEach(el => console.log(el));
+
+function isInBlackList(host, list)
 {
-  return Array.from(list).includes(url);
+  return Array.from(list).includes(host);
 }
 
 const server = http.createServer();
@@ -36,11 +44,12 @@ server.on('request', (request, res) => {
   const host = headers["host"];
   console.log(host);
 
+  
 
   if(isInBlackList(host, blackList))
   {
     console.log("perenapravlau");
-    res.writeHead(302, {Location: 'https://www.404s.design/'});
+    res.writeHead(302, {Location: '127.0.0.1:8080/blocked.html'});
     res.end();
     return;
   }
