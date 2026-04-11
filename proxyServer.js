@@ -6,9 +6,24 @@ const HOST = "0.0.0.0";
 const PORT = 8080;
 
 
-const blackList = new Set();
 
-blackList.add("neverssl.com");
+
+function fromFileToSet(path)
+{
+  try{
+  const data = fs.readFileSync(path, {encoding: "utf-8"});
+  return new Set(data.split(/\r?\n/).map((el)=>{ 
+    return el.trim().toLowerCase().match(/(?<=http\:\/\/?).+(?=\/?)/);
+  }));
+}
+  catch (error){
+    console.log(`Ошибка чтения файла: ${error.message}`);
+    return new Set();
+  }
+}
+
+const blackList = fromFileToSet("./blackList.txt");
+
 function isInBlackList(url, list)
 {
   return Array.from(list).includes(url);
