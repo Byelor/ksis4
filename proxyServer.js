@@ -43,18 +43,36 @@ server.on('request', (request, res) => {
   const {headers} = request;
   const host = headers["host"];
   console.log(host);
-
-  
+  const {url} = request;
 
   if(isInBlackList(host, blackList))
   {
     console.log("perenapravlau");
-    res.writeHead(302, {Location: '127.0.0.1:8080/blocked.html'});
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.write(fs.readFileSync("./blocked.html", {encoding: "utf-8"}));
     res.end();
     return;
   }
 
+  const options = {
+    host: host,
+    port: 80,
+    method: request.method,
+    headers: headers,
+    path: url
+  }
+  
+  const innerRequest = http.request(options, (innerResponse)=>{
+    res.writeHead(innerResponse.statusCode, innerResponse.headers);
+    innerResponse.pipe(res);
 
+  });
+  innerRequest.on("error",(error)=>{
+    console.log(`Error! ${error.message}`);
+    res.end();
+  })
+
+  request.pipe(innerRequest);
 });
 
 server.on("listening", ()=>{console.log("server starts listening!")});
