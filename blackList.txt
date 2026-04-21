@@ -1,5 +1,3 @@
-neverssl.com
-http://example.com/
-http://www.bgp1.by/&ved=2ahUKEwjTk4npnuaTAxXZIBAIHTIEINE4ChAWegQIDxAB&usg=AOvVaw2GfHifDikDowh9B565CDKo
+bgp1.by/&ved=2ahUKEwjTk4npnuaTAxXZIBAIHTIEINE4ChAWegQIDxAB&usg=AOvVaw2GfHifDikDowh9B565CDKo
 http://dipservice.by/&ved=2ahUKEwjTk4npnuaTAxXZIBAIHTIEINE4ChAWegQIEBAB&usg=AOvVaw2Jygh5-6SNcYErBln87eAO
 http://opac.bas-net.by/opacpage/rinti/index.php&ved=2ahUKEwjTk4npnuaTAxXZIBAIHTIEINE4ChAWegQIFhAB&usg=AOvVaw34fkEjUNQCeXuKf0TVMDzb

@@ -3,9 +3,9 @@ import {Buffer} from 'node:buffer';
 import fs from "fs";
 
 const HOST = "0.0.0.0";
-const PORT = 8080;
+const PORT = Number(process.argv[2]);
 
-
+const html = fs.readFileSync("./blocked.html");
 
 
 function fromFileToSet(path)
@@ -30,42 +30,48 @@ function fromFileToSet(path)
 
 const blackList = fromFileToSet("./blackList.txt");
 
+console.log("\n\nBlackList:")
 blackList.forEach(el => console.log(el));
-
+console.log("===================\n\n");
 function isInBlackList(host, list)
 {
-  return Array.from(list).includes(host);
+  return list.has(host);
 }
 
 const server = http.createServer();
 server.on('request', (request, res) => {
   
   const {headers} = request;
+  
   const host = headers["host"];
-  console.log(host);
+  if (!host) { res.writeHead(400); res.end(); return; }
   const {url} = request;
 
-  if(isInBlackList(host, blackList))
-  {
-    console.log("perenapravlau");
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    res.write(fs.readFileSync("./blocked.html", {encoding: "utf-8"}));
-    res.end();
+  const fullUrl = new URL(url, `http://${host}`);
+if(isInBlackList(fullUrl.hostname, blackList)) {
+    res.writeHead(403, { 
+        'Content-Type': 'text/html; charset=utf-8',
+        'Content-Length': Buffer.byteLength(html) 
+    });
+    console.log(`${fullUrl} - ${res.statusCode} ${res.statusMessage}`);
+    res.end(html);
     return;
-  }
+}
 
+  
   const options = {
-    host: host,
-    port: 80,
+    host: fullUrl.hostname,
+    port: fullUrl.port || 80,
     method: request.method,
     headers: headers,
-    path: url
+    path: fullUrl.pathname + fullUrl.search
+
   }
   
   const innerRequest = http.request(options, (innerResponse)=>{
     res.writeHead(innerResponse.statusCode, innerResponse.headers);
     innerResponse.pipe(res);
-
+    console.log(`${url} - ${res.statusCode} ${res.statusMessage}`);
   });
   innerRequest.on("error",(error)=>{
     console.log(`Error! ${error.message}`);
